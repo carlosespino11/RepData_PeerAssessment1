@@ -20,7 +20,8 @@ data$date = as.Date(data$date)
 steps_by_day = data %>% na.omit() %>% group_by(date) %>% summarize(steps = sum(steps, na.rm = T)) 
 
 ggplot(steps_by_day) + 
-  geom_histogram(aes(x = steps), fill = "red", alpha = ".7", color = "black", binwidth = 3000)
+  geom_histogram(aes(x = steps), fill = "red", alpha = ".7", color = "black", binwidth = 3000)+
+  ggtitle("Histogram of the total number of steps taken each day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
@@ -95,7 +96,8 @@ steps_by_day_new = data_new %>% group_by(date) %>%
   summarize(steps = sum(steps, na.rm = T)) 
 
 ggplot(steps_by_day_new) + 
-  geom_histogram(aes(x = steps), fill = "red", alpha = .7, color="black", binwidth = 3000)
+  geom_histogram(aes(x = steps), fill = "red", alpha = .7, color="black", binwidth = 3000) +
+  ggtitle("Histogram of the total number of steps by day after NA's replacement")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
