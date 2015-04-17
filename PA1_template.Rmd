@@ -1,59 +1,85 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
+title: 'Reproducible Research: Peer Assessment 1'
+output:
   html_document:
-    keep_md: true
+    keep_md: yes
+  pdf_document: default
 ---
-# ```{r setup, cache=FALSE, include=FALSE}
-# opts_chunk$set(verbose = FALSE)
-# 
-# ```
 
 ## Loading and preprocessing the data
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(dplyr)
 ```
-```{r, echo=TRUE}
-setwd("~/Desktop/datasciencecoursera/Reproducible Research/RepData_PeerAssessment1")
+1. Load activity data:
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+setwd("~/Documents/git/datasciencecoursera/Reproducible Research/RepData_PeerAssessment1")
 data = read.csv("activity.csv")
 ```
-
-## What is mean total number of steps taken per day?
-```{r, echo=TRUE, warning=FALSE}
-ggplot(data) + geom_histogram(aes(x = steps), fill = "red", alpha = ".7", color = "black")
+2. Make necessary tranformations:
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+data$date = as.Date(data$date)
 ```
-```{r, echo=TRUE}
-with(data, mean(steps, na.rm = TRUE))
-with(data, median(steps, na.rm = TRUE))
+## What is mean total number of steps taken per day?
+1. Histogram of the total steps per day:
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+steps_by_day = data %>% na.omit() %>% group_by(date) %>% summarize(steps = sum(steps, na.rm = T)) 
+
+ggplot(steps_by_day) + 
+  geom_histogram(aes(x = steps), fill = "red", alpha = ".7", color = "black", binwidth = 3000)
+```
+
+2. Computing the mean and median:
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+with(steps_by_day, mean(steps, na.rm = TRUE))
+with(steps_by_day, median(steps, na.rm = TRUE))
 ````
 
 ## What is the average daily activity pattern?
-
-```{r, echo= TRUE}
+1. Time series plot of the average steps by interval:
+```{r, echo= TRUE, message=FALSE, warning=FALSE}
 steps_by_interval = data %>% group_by(interval) %>% summarize(avg_steps = mean(steps, na.rm = T)) 
 ggplot(steps_by_interval) + geom_line(aes(x = interval, y = avg_steps), color = "#0268D4") +
   ylab("Number of steps")
 arrange(steps_by_interval, desc(avg_steps))[1,]$interval
 ```
+2. Interval with the maximum number of steps: 
+```{r, echo= TRUE, message=FALSE, warning=FALSE}
+arrange(steps_by_interval, desc(avg_steps))[1,]$interval
+```
 ## Imputing missing values
-Number of incomplete cases:
-```{r, echo = TRUE}
+1. Number of incomplete cases:
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
 sum(!complete.cases(data))  
 ````
 
-```{r}
+2. The strategy that I will follow to fill in all of the missing values in the dataset, is replacing each by the mean for that 5-minute interval. 
+
+3. Replacing the NA values, and calculating the total steps per day:
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
 data_new = data %>% 
   full_join(steps_by_interval, by = c("interval" = "interval")) %>% 
-  mutate(steps = ifelse(is.na(steps), avg_steps, steps), weekday = ifelse(weekdays(as.Date(date)) %in% c("Saturday", "Sunday"), "weekend", "weekdays" ))
+  mutate(steps = ifelse(is.na(steps), avg_steps, steps))
 
-ggplot(data_new) + geom_histogram(aes(x = steps))
-with(data_new, mean(steps))
-with(data_new, median(steps))
+steps_by_day_new = data_new %>% group_by(date) %>% 
+  summarize(steps = sum(steps, na.rm = T)) 
+
+ggplot(steps_by_day_new) + 
+  geom_histogram(aes(x = steps), fill = "red", alpha = .7, color="black", binwidth = 3000)
+with(steps_by_day_new , mean(steps))
+with(steps_by_day_new , median(steps))
 ```
 
+4. In the original data set, the mean and median are slightly different. In the new data set, the mean and median are the same.
+
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+1. We compute the variable **weekday** that indicates whether a given date is a weekday or weekend day.
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
+data_new = data_new %>% 
+  mutate(weekday = ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "weekend", "weekdays" ))
+```
+2. The next plot shows a timeline with the 5-minute intervals vs the average number of steps taken, averaged across all weekday days or weekend days:
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
 ggplot(data_new %>% group_by(weekday, interval) %>% summarize(avg_steps_day = mean(steps))) + 
   geom_line(aes(x = interval, y= avg_steps_day), color="#0268D4") + 
   facet_grid(weekday~.) + 
