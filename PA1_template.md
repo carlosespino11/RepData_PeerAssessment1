@@ -83,13 +83,14 @@ sum(!complete.cases(data))
 
 2. The strategy that I will follow to fill in all of the missing values in the dataset, is replacing each by the mean for that 5-minute interval. 
 
-3. Replacing the NA values, and calculating the total steps per day:
-
 ```r
 data_new = data %>% 
   full_join(steps_by_interval, by = c("interval" = "interval")) %>% 
   mutate(steps = ifelse(is.na(steps), avg_steps, steps))
+```
+3. Replacing the NA values, and calculating the total steps per day:
 
+```r
 steps_by_day_new = data_new %>% group_by(date) %>% 
   summarize(steps = sum(steps, na.rm = T)) 
 
@@ -97,7 +98,7 @@ ggplot(steps_by_day_new) +
   geom_histogram(aes(x = steps), fill = "red", alpha = .7, color="black", binwidth = 3000)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
 
 ```r
 with(steps_by_day_new , mean(steps))
@@ -133,5 +134,5 @@ ggplot(data_new %>% group_by(weekday, interval) %>% summarize(avg_steps_day = me
   ylab("Number of Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
 

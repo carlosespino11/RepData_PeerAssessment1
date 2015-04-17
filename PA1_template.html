@@ -119,14 +119,15 @@ ggplot(steps_by_interval) + geom_line(aes(x = interval, y = avg_steps), color = 
 <pre class="r"><code>sum(!complete.cases(data))  </code></pre>
 <pre><code>## [1] 2304</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li><p>The strategy that I will follow to fill in all of the missing values in the dataset, is replacing each by the mean for that 5-minute interval.</p></li>
-<li><p>Replacing the NA values, and calculating the total steps per day:</p></li>
+<li>The strategy that I will follow to fill in all of the missing values in the dataset, is replacing each by the mean for that 5-minute interval.</li>
 </ol>
 <pre class="r"><code>data_new = data %&gt;% 
   full_join(steps_by_interval, by = c(&quot;interval&quot; = &quot;interval&quot;)) %&gt;% 
-  mutate(steps = ifelse(is.na(steps), avg_steps, steps))
-
-steps_by_day_new = data_new %&gt;% group_by(date) %&gt;% 
+  mutate(steps = ifelse(is.na(steps), avg_steps, steps))</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Replacing the NA values, and calculating the total steps per day:</li>
+</ol>
+<pre class="r"><code>steps_by_day_new = data_new %&gt;% group_by(date) %&gt;% 
   summarize(steps = sum(steps, na.rm = T)) 
 
 ggplot(steps_by_day_new) + 

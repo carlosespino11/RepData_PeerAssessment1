@@ -54,13 +54,13 @@ sum(!complete.cases(data))
 ````
 
 2. The strategy that I will follow to fill in all of the missing values in the dataset, is replacing each by the mean for that 5-minute interval. 
-
-3. Replacing the NA values, and calculating the total steps per day:
 ```{r, echo = TRUE, message=FALSE, warning=FALSE}
 data_new = data %>% 
   full_join(steps_by_interval, by = c("interval" = "interval")) %>% 
   mutate(steps = ifelse(is.na(steps), avg_steps, steps))
-
+```
+3. Replacing the NA values, and calculating the total steps per day:
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
 steps_by_day_new = data_new %>% group_by(date) %>% 
   summarize(steps = sum(steps, na.rm = T)) 
 
