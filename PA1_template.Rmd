@@ -67,7 +67,7 @@ steps_by_day_new = data_new %>% group_by(date) %>%
 
 ggplot(steps_by_day_new) + 
   geom_histogram(aes(x = steps), fill = "red", alpha = .7, color="black", binwidth = 3000) +
-  ggtitle("Histogram of the total number of steps by day after NA's replacement")
+  ggtitle("Histogram of the total number of steps by6 day after NA's replacement")
 with(steps_by_day_new , mean(steps))
 with(steps_by_day_new , median(steps))
 ```
